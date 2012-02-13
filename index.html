@@ -1,0 +1,85 @@
+<!doctype html>
+<html>
+    <head>
+        <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+        <title>Sencha Touch 2 - Barebones Drag + Pinch + Rotate Example</title>
+
+        <!-- Sencha Touch -->
+        <link rel="stylesheet" href="http://dev.sencha.com/deploy/sencha-touch-2-b2/resources/css/sencha-touch.css">
+        <script src="http://dev.sencha.com/deploy/sencha-touch-2-b2/builds/sencha-touch-all.js" type="text/javascript"></script>
+
+        <script type="text/javascript">
+
+Ext.setup({
+    onReady: function() {
+        // We need to keep a record of the current scale and angle of the element
+        var transformDetails = {
+            scale: 1,
+            angle: 0,
+            x: 10,
+            y: 10
+        };
+
+        // We create a function so we can update the transform properties on the element when the pinch/rotate events get fired
+        var updateTransform = function() {
+            component.element.setStyle('-webkit-transform', 'scaleX(' + transformDetails.scale + ') scaleY(' + transformDetails.scale + ') rotate(' + transformDetails.angle + 'deg)');
+
+            component.setLeft(transformDetails.x);
+            component.setTop(transformDetails.y);
+        };
+
+        var lastAngle = null;
+
+        // Create a simple component with a fixed width and height and center it.
+        var component = Ext.Viewport.add({
+            html: 'Pinch me',
+            top: 10,
+            left: 10,
+            width: 300,
+            height: 300,
+            style: 'background: red',
+            listeners: {
+                // Listen to the pinch event on the element
+                pinch: {
+                    element: 'element',
+                    fn: function(e) {
+                        // Get the scale property from the event
+                        transformDetails.scale = e.scale;
+                        updateTransform();
+                    }
+                },
+
+                // Listen to the rotate event on the element
+                rotatestart: {
+                    element: 'element',
+                    fn: function(e) {
+                        lastAngle = transformDetails.angle;
+                    }
+                },
+                rotate: {
+                    element: 'element',
+                    fn: function(e) {
+                        transformDetails.angle = lastAngle + e.rotation;
+                        updateTransform();
+                    }
+                },
+
+                drag: {
+                    element: 'element',
+                    fn: function(e) {
+                        transformDetails.x += e.previousDeltaX;
+                        transformDetails.y += e.previousDeltaY;
+
+                        updateTransform();
+                    }
+                }
+            }
+        });
+    }
+});
+
+        </script>
+    </head>
+
+    <body></body>
+</html>
